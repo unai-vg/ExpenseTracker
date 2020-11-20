@@ -24,6 +24,7 @@ else
                 <th>Amount</th>
                 <th>Currency</th>
                 <th>Type</th>
+                <th>Date</th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +36,7 @@ else
                     <td>@item.Amount</td>
                     <td>@item.Currency</td>
                     <td>@item.ExpenseType</td>
+                    <td>@item.TransactionTime.ToLocalTime().ToString("dd.MM.yyyy")</td>
                 </tr>
             }
         </tbody>
