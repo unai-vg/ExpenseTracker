@@ -1,0 +1,34 @@
+﻿<EditForm Model="@item" OnValidSubmit="HandleValidSubmit" class="mb-1">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <label for="recipient">Recipient</label>
+    <InputText id="recipient" @bind-Value="item.Recipient" class="form-control" />
+    <label for="amount">Amount</label>
+    <InputNumber id="amount" Label="Amount" @bind-Value="item.Amount" class="form-control" />
+    <label for="currency">Curency</label>
+    <InputText id="currency" @bind-Value="item.Currency" class="form-control" />
+    <label for="expenseType">Expense type</label>
+    <select @bind="expenseTypeInt" class="form-control" >
+        @foreach (var typee in Enum.GetValues(typeof(ExpenseTracker.Domain.Data.ExpenseType)))
+        {
+            <option value="@((int)typee)">@typee</option>
+        }
+    </select>
+    <label for="transactionTime">Transaction time</label>
+    <InputDate id="transactionTime" @bind-Value="item.TransactionTime" class="form-control" />
+    <button class="btn btn-primary mt-3 mb-3" type="submit">@SubmitLabel</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public ExpenseTracker.Domain.Data.Expense item { get; set; }
+
+    [Parameter]
+    public EventCallback HandleValidSubmit { get; set; }
+
+    [Parameter]
+    public string SubmitLabel { get; set; }
+
+    int expenseTypeInt { get => (int)item.ExpenseType; set => item.ExpenseType = (ExpenseTracker.Domain.Data.ExpenseType)value; }
+
+}

@@ -1,0 +1,72 @@
+﻿@page "/edit/{id}"
+
+@using ExpenseTracker.Client.Data
+@using ExpenseTracker.Domain.Data
+@using ExpenseTracker.Client.Services
+@using ExpenseTracker.Client.Components
+
+@inject NavigationManager NavManager
+@inject ExpenseService Service
+@inject Toaster Toaster
+
+<h1>Expense details</h1>
+
+@if (item == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ExpenseInput item="@item" HandleValidSubmit="HandleValidSubmit" SubmitLabel="Update" />
+    <button class="btn btn-primary" @onclick="() => GoBackToIndex()">Back</button>
+    <button class="btn btn-primary" @onclick="() => DeleteExpense()">Delete expense</button>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    Guid _id = Guid.Empty;
+
+    private Expense item;
+    Bread bread;
+
+    protected override async Task OnInitializedAsync()
+    {
+        item = null;
+        if (!string.IsNullOrEmpty(Id) && Guid.TryParse(Id, out var _id))
+        {
+            (bread, item) = await Service.GetExpense(_id);
+            Toaster.Toast(bread);
+        }
+        if (item == null)
+        {
+            await GoBackToIndex();
+        }
+    }
+
+    async Task GoBackToIndex()
+    {
+        await Task.Yield();
+        NavManager.NavigateTo("/");
+    }
+
+    async Task HandleValidSubmit()
+    {
+        await HandleResponseBread(await Service.UpdateExpense(item));
+    }
+
+    async Task DeleteExpense()
+    {
+        await HandleResponseBread(await Service.RemoveExpense(item));
+    }
+
+    async Task HandleResponseBread(Bread bread)
+    {
+        Toaster.Toast(bread);
+        if (bread.Level == Bread.Hawtness.Success)
+        {
+            await GoBackToIndex();
+        }
+    }
+}

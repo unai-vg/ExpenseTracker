@@ -1,0 +1,63 @@
+﻿@page "/"
+
+@using ExpenseTracker.Domain.Data
+@using ExpenseTracker.Client.Services
+@using ExpenseTracker.Client.Data
+
+@inject NavigationManager NavManager
+@inject ExpenseService Service
+@inject Toaster Toaster
+
+<h1>List of existing expenses</h1>
+
+@if (items == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Recipient</th>
+                <th>Amount</th>
+                <th>Currency</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in items)
+            {
+                <tr @onclick="() => ViewDetails(item.Id.ToString())">
+                    <td>@item.Id</td>
+                    <td>@item.Recipient</td>
+                    <td>@item.Amount</td>
+                    <td>@item.Currency</td>
+                    <td>@item.ExpenseType</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Expense> items;
+    Bread bread;
+
+    protected override async Task OnInitializedAsync()
+    {
+        (bread, items) = await Service.GetExpenses();
+        if (items == null)
+        {
+            items = new List<Expense>();
+        }
+        Toaster.Toast(bread);
+    }
+
+    async Task ViewDetails(string id)
+    {
+        await Task.Yield();
+        NavManager.NavigateTo("edit/" + id);
+    }
+}

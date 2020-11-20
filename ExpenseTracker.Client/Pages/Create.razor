@@ -1,0 +1,49 @@
+﻿@page "/create"
+
+@using ExpenseTracker.Client.Data
+@using ExpenseTracker.Domain.Data
+@using ExpenseTracker.Client.Services
+@using ExpenseTracker.Client.Components
+
+@inject NavigationManager NavManager
+@inject ExpenseService Service
+@inject Toaster Toaster
+
+<h1>Add a new expense</h1>
+
+@if (item == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ExpenseInput item="@item" HandleValidSubmit="HandleValidSubmit" SubmitLabel="Create" />
+    <button class="btn btn-primary" @onclick="() => GoBackToIndex()">Back</button>
+}
+
+@code {
+
+    private Expense item;
+
+    protected override async Task OnInitializedAsync()
+    {
+        item = new Expense() { TransactionTime = DateTime.Now };
+        await Task.Yield();
+    }
+
+    async Task HandleValidSubmit()
+    {
+        var bread = await Service.AddExpense(item);
+        Toaster.Toast(bread);
+        if (bread.Level == Bread.Hawtness.Success)
+        {
+            NavManager.NavigateTo("/");
+        }
+    }
+
+    async Task GoBackToIndex()
+    {
+        await Task.Yield();
+        NavManager.NavigateTo("/");
+    }
+}
